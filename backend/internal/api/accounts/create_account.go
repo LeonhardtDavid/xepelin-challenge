@@ -17,7 +17,7 @@ const (
 
 func Create(handler handler.AccountCommandHandler) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		account, err := parseAndValidate(ctx)
+		account, err := parseAndValidateAccount(ctx)
 		if err != nil {
 			ctx.Error(err)
 			return
@@ -25,7 +25,7 @@ func Create(handler handler.AccountCommandHandler) gin.HandlerFunc {
 		accountId := uuid.New()
 		account.Id = &accountId
 
-		err = handler.Handle(
+		err = handler.HandleCreate(
 			domain.CreateAccount{
 				Id:      uuid.New(),
 				Account: *account,
@@ -37,12 +37,12 @@ func Create(handler handler.AccountCommandHandler) gin.HandlerFunc {
 			return
 		}
 
-		ctx.Status(http.StatusAccepted)
 		ctx.Header("Location", fmt.Sprintf("/accounts/%s", accountId)) // TODO not actually implemented
+		ctx.JSON(http.StatusAccepted, account)
 	}
 }
 
-func parseAndValidate(ctx *gin.Context) (*domain.Account, error) {
+func parseAndValidateAccount(ctx *gin.Context) (*domain.Account, error) {
 	var account domain.Account
 	if err := ctx.ShouldBindJSON(&account); err != nil {
 		return nil, &errors.BadRequestError{
@@ -59,8 +59,6 @@ func parseAndValidate(ctx *gin.Context) (*domain.Account, error) {
 	customerId, _ := ctx.Get(CustomerIdHeader) // It's always present, it's handled by middleware.RetrieveCustomer
 	customerUUID := customerId.(uuid.UUID)
 	account.CustomerId = &customerUUID
-
-	// TODO validate against balance
 
 	return &account, nil
 }

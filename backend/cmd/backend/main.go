@@ -25,9 +25,17 @@ func main() {
 		return
 	}
 
+	transactionRepository := repositories.NewDummyTransactionWriteRepository()
+
 	s := app.New(
 		app.WithPort(config.Port),
-		app.WithAccountCommandHandler(handler.NewAccountCommandHandler(repositories.NewDummyAccountWriteRepository())),
+		app.WithAccountCommandHandler(
+			handler.NewAccountCommandHandler(
+				repositories.NewDummyAccountWriteRepository(),
+				repositories.ToDummyTransactionReadRepository(transactionRepository),
+			),
+		),
+		app.WithTransactionCommandHandler(handler.NewTransactionCommandHandler(transactionRepository)),
 	)
 
 	go func() {

@@ -15,10 +15,11 @@ import (
 )
 
 type Server struct {
-	httpServer            *http.Server
-	router                *gin.Engine
-	port                  int
-	accountCommandHandler handler.AccountCommandHandler
+	httpServer                *http.Server
+	router                    *gin.Engine
+	port                      int
+	accountCommandHandler     handler.AccountCommandHandler
+	transactionCommandHandler handler.TransactionCommandHandler
 }
 
 func (s *Server) setupRoutes() {
@@ -30,13 +31,13 @@ func (s *Server) setupRoutes() {
 	accountsGroup := s.router.Group("/accounts")
 	{
 		accountsGroup.POST("", accounts.Create(s.accountCommandHandler))
-		accountsGroup.GET("/:id/balance", accounts.GetBalance)
+		accountsGroup.GET("/:id/balance", accounts.GetBalance(s.accountCommandHandler))
 	}
 	transactionsGroup := s.router.Group("/transactions")
 	{
 		transactionsGroup.POST("",
 			transactMiddleware.LogDepositsOver(decimal.NewFromInt(10000)), // TODO add config for amount?
-			transactions.Make(),
+			transactions.Make(s.transactionCommandHandler),
 		)
 	}
 }
@@ -67,6 +68,12 @@ func WithPort(port int) Options {
 func WithAccountCommandHandler(handler handler.AccountCommandHandler) Options {
 	return func(s *Server) {
 		s.accountCommandHandler = handler
+	}
+}
+
+func WithTransactionCommandHandler(handler handler.TransactionCommandHandler) Options {
+	return func(s *Server) {
+		s.transactionCommandHandler = handler
 	}
 }
 

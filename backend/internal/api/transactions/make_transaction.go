@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/domain"
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/errors"
+	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/handler"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
+	"time"
 )
 
-func Make() gin.HandlerFunc {
+func Make(handler handler.TransactionCommandHandler) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		transaction, err := parseAndValidate(ctx)
 		if err != nil {
@@ -19,7 +21,27 @@ func Make() gin.HandlerFunc {
 		transactionId := uuid.New()
 		transaction.Id = &transactionId
 
-		// TODO add some logic
+		if transaction.TransactionType == domain.Deposit {
+			err = handler.HandleDeposit(
+				domain.CreateDepositTransaction{
+					Id:          uuid.New(),
+					Transaction: *transaction,
+					Time:        time.Now(),
+				},
+			)
+		} else {
+			err = handler.HandleWithdraw(
+				domain.CreateWithdrawTransaction{
+					Id:          uuid.New(),
+					Transaction: *transaction,
+					Time:        time.Now(),
+				},
+			)
+		}
+		if err != nil {
+			ctx.Error(err)
+			return
+		}
 
 		ctx.JSON(http.StatusOK, transaction)
 	}

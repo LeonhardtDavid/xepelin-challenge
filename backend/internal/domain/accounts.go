@@ -40,7 +40,8 @@ type AccountCreated struct {
 }
 
 type Balance struct {
-	Amount decimal.Decimal
+	AccountId uuid.UUID       `json:"account_id"`
+	Amount    decimal.Decimal `json:"amount"`
 }
 
 type GetAccountBalance struct {
