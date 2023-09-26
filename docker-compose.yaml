@@ -1,0 +1,16 @@
+version: "2.4"
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8081:8080"
+
+  api-gateway:
+    image: apache/apisix:3.5.0-debian
+    environment:
+      - APISIX_STAND_ALONE=true
+    ports:
+      - "8080:9080"
+    volumes:
+      - ./apisix.yaml:/usr/local/apisix/conf/apisix.yaml

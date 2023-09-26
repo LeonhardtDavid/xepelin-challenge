@@ -1,0 +1,26 @@
+plugins:
+  - name: basic-auth
+  - name: proxy-rewrite
+
+consumers:
+  - username: testu
+    plugins:
+      basic-auth:
+        username: testu
+        password: testp
+      proxy-rewrite:
+        headers:
+          set:
+            "X-Customer-Id": "46041820-133d-4e24-99d3-90c1f9b6efcd"
+
+routes:
+  - uri: /*
+    upstream:
+      nodes:
+        "backend:8080": 1
+        # "xepelin-test.free.beeceptor.com:443": 1
+      type: roundrobin
+    plugins:
+      basic-auth: {}
+
+#END
