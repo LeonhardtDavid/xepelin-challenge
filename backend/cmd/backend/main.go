@@ -2,24 +2,32 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/app"
+	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/handler"
+	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/repositories"
 	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
 func main() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	config, err := LoadConfig()
 	if err != nil {
-		log.Fatalln(err)
+		slog.Error(fmt.Sprintf("Error loading configurations: %v", err))
+		return
 	}
 
 	s := app.New(
 		app.WithPort(config.Port),
+		app.WithAccountCommandHandler(handler.NewAccountCommandHandler(repositories.NewDummyAccountWriteRepository())),
 	)
 
 	go func() {
@@ -27,13 +35,13 @@ func main() {
 		signal.Notify(sigChan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
 		<-sigChan
 		if err := s.Stop(ctx); err != nil {
-			log.Fatalln("Error while shutting down server", err)
+			slog.Error(fmt.Sprintf("Error while shutting down server: %v", err))
 		}
 		cancel()
 	}()
 
 	err = s.Start()
 	if err != nil {
-		log.Fatalln("[Error] failed to start Gin server due to:", err)
+		slog.ErrorContext(ctx, fmt.Sprintf("Failed to start server due to: %v", err))
 	}
 }
