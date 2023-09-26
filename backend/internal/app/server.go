@@ -25,17 +25,19 @@ type Server struct {
 
 func (s *Server) setupRoutes() {
 	// TODO add tracing id for metrics
-	s.router.Use(middleware.HandleErrors, middleware.RetrieveCustomer)
+	s.router.Use(middleware.HandleErrors)
 
 	s.router.GET("/live", api.Liveness)
 	s.router.GET("/ready", api.Readiness)
 	accountsGroup := s.router.Group("/accounts")
 	{
+		accountsGroup.Use(middleware.RetrieveCustomer)
 		accountsGroup.POST("", accounts.Create(s.accountCommandHandler))
 		accountsGroup.GET("/:id/balance", accounts.GetBalance(s.accountCommandHandler))
 	}
 	transactionsGroup := s.router.Group("/transactions")
 	{
+		transactionsGroup.Use(middleware.RetrieveCustomer)
 		transactionsGroup.POST("",
 			transactMiddleware.LogDepositsOver(decimal.NewFromInt(10000)), // TODO add config for amount?
 			transactions.Make(s.transactionCommandHandler),
