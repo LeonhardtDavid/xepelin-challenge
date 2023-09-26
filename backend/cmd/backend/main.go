@@ -48,7 +48,7 @@ func main() {
 		cancel()
 	}()
 
-	err = s.Start()
+	err = s.Start(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, fmt.Sprintf("Failed to start server due to: %v", err))
 	}

@@ -11,6 +11,7 @@ import (
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/handler"
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
+	"log/slog"
 	"net/http"
 )
 
@@ -42,8 +43,10 @@ func (s *Server) setupRoutes() {
 	}
 }
 
-func (s *Server) Start() error {
+func (s *Server) Start(ctx context.Context) error {
 	port := fmt.Sprintf(":%d", s.port)
+
+	slog.InfoContext(ctx, "Starting Server at", "port", port)
 
 	s.httpServer = &http.Server{
 		Addr:    port,
