@@ -8,7 +8,7 @@ import (
 )
 
 type TransactionCommandHandler struct {
-	writeRepository repositories.TransactionWriteRepository
+	writeRepository repositories.TransactionRepository
 }
 
 func (h *TransactionCommandHandler) HandleDeposit(command domain.CreateDepositTransaction) error {
@@ -31,7 +31,7 @@ func (h *TransactionCommandHandler) HandleWithdraw(command domain.CreateWithdraw
 	return h.writeRepository.SaveWithdraw(event)
 }
 
-func NewTransactionCommandHandler(writeRepository repositories.TransactionWriteRepository) TransactionCommandHandler {
+func NewTransactionCommandHandler(writeRepository repositories.TransactionRepository) TransactionCommandHandler {
 	return TransactionCommandHandler{
 		writeRepository: writeRepository,
 	}

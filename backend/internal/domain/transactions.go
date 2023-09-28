@@ -44,20 +44,32 @@ type CreateDepositTransaction struct {
 	Time        time.Time
 }
 
-type DepositedTransaction struct {
-	Id          uuid.UUID
-	Transaction Transaction
-	Time        time.Time
-}
-
 type CreateWithdrawTransaction struct {
 	Id          uuid.UUID
 	Transaction Transaction
 	Time        time.Time
 }
 
+type TransactionEvent interface {
+	GetTransaction() Transaction
+}
+
+type DepositedTransaction struct {
+	Id          uuid.UUID
+	Transaction Transaction
+	Time        time.Time
+}
+
+func (t *DepositedTransaction) GetTransaction() Transaction {
+	return t.Transaction
+}
+
 type WithdrawnTransaction struct {
 	Id          uuid.UUID
 	Transaction Transaction
 	Time        time.Time
+}
+
+func (t *WithdrawnTransaction) GetTransaction() Transaction {
+	return t.Transaction
 }

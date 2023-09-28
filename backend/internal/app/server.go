@@ -25,7 +25,7 @@ type Server struct {
 
 func (s *Server) setupRoutes() {
 	// TODO add tracing id for metrics
-	s.router.Use(middleware.HandleErrors)
+	s.router.Use(gin.Recovery(), middleware.HandleErrors)
 
 	s.router.GET("/live", api.Liveness)
 	s.router.GET("/ready", api.Readiness)
@@ -84,7 +84,7 @@ func WithTransactionCommandHandler(handler handler.TransactionCommandHandler) Op
 
 func New(options ...Options) *Server {
 	s := &Server{
-		router: gin.Default(),
+		router: gin.New(),
 		port:   8080,
 	}
 

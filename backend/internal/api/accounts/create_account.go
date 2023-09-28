@@ -37,8 +37,8 @@ func Create(handler handler.AccountCommandHandler) gin.HandlerFunc {
 			return
 		}
 
-		ctx.Header("Location", fmt.Sprintf("/accounts/%s", accountId)) // TODO not actually implemented
-		ctx.JSON(http.StatusAccepted, account)
+		ctx.Header("Location", fmt.Sprintf("%s/%s", ctx.FullPath(), accountId)) // TODO not actually implemented
+		ctx.JSON(http.StatusCreated, account)
 	}
 }
 
@@ -56,7 +56,7 @@ func parseAndValidateAccount(ctx *gin.Context) (*domain.Account, error) {
 		}
 	}
 
-	customerId, _ := ctx.Get(CustomerIdHeader) // It's always present, it's handled by middleware.RetrieveCustomer
+	customerId, _ := ctx.Get(CustomerIdHeader) // It's always present at this point, it's handled by middleware.RetrieveCustomer
 	customerUUID := customerId.(uuid.UUID)
 	account.CustomerId = &customerUUID
 

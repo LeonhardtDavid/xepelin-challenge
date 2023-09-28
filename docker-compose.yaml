@@ -14,3 +14,5 @@ services:
       - "8080:9080"
     volumes:
       - ./apisix.yaml:/usr/local/apisix/conf/apisix.yaml
+    depends_on:
+      - backend

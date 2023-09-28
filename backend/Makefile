@@ -1,6 +1,6 @@
 .PHONY: build
 build:
-	go build -o bin/backend cmd/backend/main.go cmd/backend/config.go
+	go build -o bin/backend cmd/backend/main.go
 
 test:
 	go test ./...

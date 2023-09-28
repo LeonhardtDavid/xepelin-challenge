@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/app"
+	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/config"
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/handler"
+	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/infra"
+	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/queries"
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/repositories"
 	"log"
 	"log/slog"
@@ -19,23 +22,26 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	config, err := LoadConfig()
+	conf, err := config.LoadConfig()
 	if err != nil {
 		slog.Error(fmt.Sprintf("Error loading configurations: %v", err))
 		return
 	}
 
-	transactionRepository := repositories.NewDummyTransactionWriteRepository()
+	accountStorage := infra.DummyAccountStorage{}
+	transactionStorage := infra.DummyTransactionStorage{}
 
 	s := app.New(
-		app.WithPort(config.Port),
+		app.WithPort(conf.Port),
 		app.WithAccountCommandHandler(
 			handler.NewAccountCommandHandler(
-				repositories.NewDummyAccountWriteRepository(),
-				repositories.ToDummyTransactionReadRepository(transactionRepository),
+				repositories.NewDummyAccountRepository(&accountStorage),
+				queries.NewDummyTransactionQuery(&transactionStorage),
 			),
 		),
-		app.WithTransactionCommandHandler(handler.NewTransactionCommandHandler(transactionRepository)),
+		app.WithTransactionCommandHandler(
+			handler.NewTransactionCommandHandler(repositories.NewDummyTransactionRepository(&transactionStorage)),
+		),
 	)
 
 	go func() {

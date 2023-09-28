@@ -2,29 +2,24 @@ package repositories
 
 import (
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/domain"
-	"sync"
+	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/infra"
 )
 
-type AccountWriteRepository interface {
+type AccountRepository interface {
 	Save(created domain.AccountCreated) error
 }
 
-type dummyAccountWriteRepository struct {
-	mux  sync.RWMutex
-	list []domain.AccountCreated
+type dummyAccountRepository struct {
+	storage *infra.DummyAccountStorage
 }
 
-func (r *dummyAccountWriteRepository) Save(created domain.AccountCreated) error {
-	r.mux.Lock()
-	defer r.mux.Unlock()
-	r.list = append(r.list, created)
-
-	return nil
+func (r *dummyAccountRepository) Save(created domain.AccountCreated) error {
+	return r.storage.Save(created)
 }
 
-func NewDummyAccountWriteRepository() AccountWriteRepository {
-	r := &dummyAccountWriteRepository{
-		list: []domain.AccountCreated{},
+func NewDummyAccountRepository(storage *infra.DummyAccountStorage) AccountRepository {
+	r := &dummyAccountRepository{
+		storage: storage,
 	}
 
 	return r
