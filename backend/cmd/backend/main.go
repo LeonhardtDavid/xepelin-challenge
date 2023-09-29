@@ -6,9 +6,9 @@ import (
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/app"
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/config"
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/handler"
-	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/infra"
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/queries"
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/repositories"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"log/slog"
 	"os"
@@ -28,20 +28,23 @@ func main() {
 		return
 	}
 
-	accountStorage := infra.DummyAccountStorage{}
-	transactionStorage := infra.DummyTransactionStorage{}
+	dbpool, err := pgxpool.New(ctx, conf.DatabaseUrl)
+	if err != nil {
+		slog.Error(fmt.Sprintf("Error connecting to the database: %v", err))
+		return
+	}
 
 	s := app.New(
 		app.WithPort(conf.Port),
 		app.WithAccountCommandHandler(
 			handler.NewAccountCommandHandler(
-				repositories.NewDummyAccountRepository(&accountStorage),
-				queries.NewDummyAccountQuery(&accountStorage),
-				queries.NewDummyTransactionQuery(&transactionStorage),
+				repositories.NewPostgresAccountRepository(dbpool),
+				queries.NewPostgresAccountQuery(dbpool),
+				queries.NewDummyTransactionQuery(dbpool),
 			),
 		),
 		app.WithTransactionCommandHandler(
-			handler.NewTransactionCommandHandler(repositories.NewDummyTransactionRepository(&transactionStorage)),
+			handler.NewTransactionCommandHandler(repositories.NewPostgresTransactionRepository(dbpool)),
 		),
 	)
 
@@ -52,6 +55,7 @@ func main() {
 		if err := s.Stop(ctx); err != nil {
 			slog.Error(fmt.Sprintf("Error while shutting down server: %v", err))
 		}
+		dbpool.Close()
 		cancel()
 	}()
 

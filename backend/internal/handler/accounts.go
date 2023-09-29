@@ -38,7 +38,7 @@ func (h *AccountCommandHandler) HandleGetBalance(ctx context.Context, command do
 		return decimal.Zero, errors.New("account doesn't belongs to user")
 	}
 
-	return h.transactionQuery.GetBalance(ctx, command.AccountId), nil
+	return h.transactionQuery.GetBalance(ctx, command.AccountId)
 }
 
 func NewAccountCommandHandler(

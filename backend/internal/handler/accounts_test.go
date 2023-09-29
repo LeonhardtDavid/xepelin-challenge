@@ -198,9 +198,9 @@ type testTransactionQuery struct {
 	balance   decimal.Decimal
 }
 
-func (q *testTransactionQuery) GetBalance(_ context.Context, accountId uuid.UUID) decimal.Decimal {
+func (q *testTransactionQuery) GetBalance(_ context.Context, accountId uuid.UUID) (decimal.Decimal, error) {
 	q.acc.Add(1)
 	q.accountId = accountId
 	q.balance = decimal.NewFromFloat(rand.Float64())
-	return q.balance
+	return q.balance, nil
 }

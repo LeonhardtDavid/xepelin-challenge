@@ -36,7 +36,7 @@ func Create(handler handler.AccountCommandHandler) gin.HandlerFunc {
 		}
 
 		ctx.Header("Location", fmt.Sprintf("%s/%s", ctx.FullPath(), accountId)) // TODO not actually implemented
-		ctx.JSON(http.StatusCreated, account)
+		ctx.JSON(http.StatusAccepted, account)
 	}
 }
 

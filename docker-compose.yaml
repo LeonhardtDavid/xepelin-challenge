@@ -3,8 +3,12 @@ version: "2.4"
 services:
   backend:
     build: ./backend
+    environment:
+      - DATABASE_URL=postgres://puser:ppass@postgres:5432/xepelin
     ports:
       - "8081:8080"
+    depends_on:
+      - postgres
 
   api-gateway:
     image: apache/apisix:3.5.0-debian
@@ -16,3 +20,14 @@ services:
       - ./apisix.yaml:/usr/local/apisix/conf/apisix.yaml
     depends_on:
       - backend
+  
+  postgres:
+    image: postgres:16.0-alpine3.18
+    environment:
+      - POSTGRES_USER=puser
+      - POSTGRES_PASSWORD=ppass
+      - POSTGRES_DB=xepelin
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql

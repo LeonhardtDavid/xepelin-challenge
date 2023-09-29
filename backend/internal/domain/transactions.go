@@ -55,7 +55,9 @@ type CreateWithdrawTransaction struct {
 //// EVENTS
 
 type TransactionEvent interface {
+	GetId() uuid.UUID
 	GetTransaction() Transaction
+	GetTime() time.Time
 }
 
 type DepositedTransaction struct {
@@ -64,8 +66,16 @@ type DepositedTransaction struct {
 	Time        time.Time
 }
 
+func (t *DepositedTransaction) GetId() uuid.UUID {
+	return t.Id
+}
+
 func (t *DepositedTransaction) GetTransaction() Transaction {
 	return t.Transaction
+}
+
+func (t *DepositedTransaction) GetTime() time.Time {
+	return t.Time
 }
 
 type WithdrawnTransaction struct {
@@ -74,6 +84,14 @@ type WithdrawnTransaction struct {
 	Time        time.Time
 }
 
+func (t *WithdrawnTransaction) GetId() uuid.UUID {
+	return t.Id
+}
+
 func (t *WithdrawnTransaction) GetTransaction() Transaction {
 	return t.Transaction
+}
+
+func (t *WithdrawnTransaction) GetTime() time.Time {
+	return t.Time
 }
