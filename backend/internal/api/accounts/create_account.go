@@ -2,6 +2,7 @@ package accounts
 
 import (
 	"fmt"
+	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/api"
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/domain"
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/errors"
 	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/handler"
@@ -9,10 +10,6 @@ import (
 	"github.com/google/uuid"
 	"net/http"
 	"time"
-)
-
-const (
-	CustomerIdHeader = "X-Customer-Id" // TODO Set header using an API Gateway that handles the authentication
 )
 
 func Create(handler handler.AccountCommandHandler) gin.HandlerFunc {
@@ -26,6 +23,7 @@ func Create(handler handler.AccountCommandHandler) gin.HandlerFunc {
 		account.Id = &accountId
 
 		err = handler.HandleCreate(
+			ctx,
 			domain.CreateAccount{
 				Id:      uuid.New(),
 				Account: *account,
@@ -56,9 +54,8 @@ func parseAndValidateAccount(ctx *gin.Context) (*domain.Account, error) {
 		}
 	}
 
-	customerId, _ := ctx.Get(CustomerIdHeader) // It's always present at this point, it's handled by middleware.RetrieveCustomer
-	customerUUID := customerId.(uuid.UUID)
-	account.CustomerId = &customerUUID
+	customerId := api.GetCustomerId(ctx)
+	account.CustomerId = &customerId
 
 	return &account, nil
 }

@@ -36,6 +36,7 @@ func main() {
 		app.WithAccountCommandHandler(
 			handler.NewAccountCommandHandler(
 				repositories.NewDummyAccountRepository(&accountStorage),
+				queries.NewDummyAccountQuery(&accountStorage),
 				queries.NewDummyTransactionQuery(&transactionStorage),
 			),
 		),

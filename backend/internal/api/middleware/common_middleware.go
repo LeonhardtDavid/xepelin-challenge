@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"errors"
-	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/api/accounts"
+	"github.com/LeonhardtDavid/xepelin-challenge/backend/internal/api"
 	internalErrors "github.com/LeonhardtDavid/xepelin-challenge/backend/internal/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -17,7 +17,7 @@ type ErrorResponse struct {
 func HandleErrors(ctx *gin.Context) {
 	ctx.Next()
 
-	if ctx.Errors != nil && len(ctx.Errors) > 0 {
+	if ctx.Errors != nil {
 		for _, err := range ctx.Errors {
 			var badRequestError *internalErrors.BadRequestError
 			var unauthorizedError *internalErrors.UnauthorizedError
@@ -53,7 +53,7 @@ func HandleErrors(ctx *gin.Context) {
 }
 
 func RetrieveCustomer(ctx *gin.Context) {
-	if customerId, err := uuid.Parse(ctx.GetHeader(accounts.CustomerIdHeader)); err != nil {
+	if customerId, err := uuid.Parse(ctx.GetHeader(api.CustomerIdHeader)); err != nil {
 		ctx.Error(
 			&internalErrors.UnauthorizedError{
 				Message: "Unauthorized",
@@ -61,7 +61,7 @@ func RetrieveCustomer(ctx *gin.Context) {
 		)
 		ctx.Abort()
 	} else {
-		ctx.Set(accounts.CustomerIdHeader, customerId)
+		ctx.Set(api.CustomerIdHeader, customerId)
 		ctx.Next()
 	}
 

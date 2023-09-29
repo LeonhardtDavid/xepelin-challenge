@@ -27,13 +27,9 @@ func (a *Account) Validate() error {
 	return nil
 }
 
-type CreateAccount struct {
-	Id      uuid.UUID
-	Account Account
-	Time    time.Time
-}
+//// COMMANDS
 
-type AccountCreated struct {
+type CreateAccount struct {
 	Id      uuid.UUID
 	Account Account
 	Time    time.Time
@@ -44,7 +40,16 @@ type Balance struct {
 	Amount    decimal.Decimal `json:"amount"`
 }
 
+//// EVENTS
+
+type AccountCreated struct {
+	Id      uuid.UUID
+	Account Account
+	Time    time.Time
+}
+
 type GetAccountBalance struct {
-	Id        uuid.UUID
-	AccountId uuid.UUID
+	Id         uuid.UUID
+	AccountId  uuid.UUID
+	CustomerId uuid.UUID
 }

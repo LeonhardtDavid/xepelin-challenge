@@ -23,6 +23,7 @@ func Make(handler handler.TransactionCommandHandler) gin.HandlerFunc {
 
 		if transaction.TransactionType == domain.Deposit {
 			err = handler.HandleDeposit(
+				ctx,
 				domain.CreateDepositTransaction{
 					Id:          uuid.New(),
 					Transaction: *transaction,
@@ -31,6 +32,7 @@ func Make(handler handler.TransactionCommandHandler) gin.HandlerFunc {
 			)
 		} else {
 			err = handler.HandleWithdraw(
+				ctx,
 				domain.CreateWithdrawTransaction{
 					Id:          uuid.New(),
 					Transaction: *transaction,

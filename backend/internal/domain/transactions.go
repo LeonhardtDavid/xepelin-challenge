@@ -38,6 +38,8 @@ func (t *Transaction) Validate() error {
 	return nil
 }
 
+//// COMMANDS
+
 type CreateDepositTransaction struct {
 	Id          uuid.UUID
 	Transaction Transaction
@@ -49,6 +51,8 @@ type CreateWithdrawTransaction struct {
 	Transaction Transaction
 	Time        time.Time
 }
+
+//// EVENTS
 
 type TransactionEvent interface {
 	GetTransaction() Transaction
