@@ -22,6 +22,43 @@ Faltantes o a mejorar:
 - Tener algún mecanismo de snapshots, para en caso de tener que recrear la base de lectura, no necesitar leer el historial completo
 - Configurar CI (ej. GitHub Actions)
 
+## Documentación de API
+
+### Crear cuenta
+
+Utilizando `docker-compose` si se quiere acceder directamente a la aplicación, se puede ustilizar el puerto `8081`,
+y agregar el header `X-Customer-Id` con un UUID como valor.
+
+```shell
+curl --location 'http://localhost:8080/accounts' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic dGVzdHU6dGVzdHA=' \
+--data '{
+    "name": "Pepe",
+    "account_number": "AAB123"
+}'
+```
+
+### Obtener el balance de cuenta
+
+```shell
+curl --location 'http://localhost:8080/accounts/0b44dd18-3ff3-45e5-8fc2-c4ec050a714a/balance' \
+--header 'Authorization: Basic dGVzdHU6dGVzdHA='
+```
+
+### Realizar una transacción
+
+```shell
+curl --location 'http://localhost:8080/transactions' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic dGVzdHU6dGVzdHA=' \
+--data '{
+    "account_id": "0b44dd18-3ff3-45e5-8fc2-c4ec050a714a",
+    "transaction_type": "DEPOSIT",
+    "_transaction_type": "WITHDRAW",
+    "amount": 10300
+}'
+```
 
 ## Cómo ejecutar la aplicación
 
